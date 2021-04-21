@@ -12,31 +12,47 @@ namespace Depremler
     {
         static void Main(string[] args)
         {
-            int total=0;
-
-            Class_ class_ = new Class_();
-            class_.TextOlustur();
-            
-            string Site = "http://www.earthquakenewstoday.com/feed/";
-            XmlDocument Veri = new XmlDocument();
-            Veri.Load(Site);
-
-            XmlNodeList Liste = Veri.GetElementsByTagName("title");
-            total = Liste.Count;
-
-            List<string> satırlar = new List<string>();
-            satırlar = File.ReadAllLines(@"depremler.txt").ToList();
-            foreach (string satır in satırlar)
+            string yol = @"depremler.txt";
+            if (File.Exists(@"depremler.txt"))
             {
-                Console.WriteLine(satır);
+                Console.WriteLine("Depremler.txt zaten var.");
+                goto Karsilastirma;
             }
-           
-            for (int i = 0; i < Liste.Count; i++)
+            Class_ textolustur = new Class_();
+            textolustur.TextOlustur(yol);
+
+            Class_ verioku = new Class_();
+            verioku.Vericekme(yol);
+
+        Karsilastirma:
+            string yol1 = @"degisim.txt";
+            Class_ degtextolustur = new Class_();
+            degtextolustur.TextOlustur(yol1);
+
+            Class_ verioku1 = new Class_();
+            verioku1.Vericekme(yol1);
+
+            FileStream fs1 = new FileStream(yol, FileMode.Open, FileAccess.Read);
+            StreamReader sw = new StreamReader(fs1);
+            string yazi = sw.ReadLine();
+            FileStream fs2 = new FileStream(yol1, FileMode.Open, FileAccess.Read);
+            StreamReader sw2 = new StreamReader(fs2);
+            string yazi2 = sw2.ReadLine();
+            while (true) 
             {
-                satırlar.Add(Liste[i].InnerText.ToString());
-                File.WriteAllLines(@"depremler.txt", satırlar);
+                Console.Clear();
+                if (yazi == yazi2)
+                {
+                    Console.WriteLine("degisimyok");
+                    break;
+                }
+                else 
+                {
+                    Console.WriteLine("Yeni bir deprem olmuş.");
+                    break;
+                }
             }
-            Console.WriteLine("Veriler 'Depremler.txt'ye yazıldı.");
+            Console.ReadKey();
         }   
     }
 }
