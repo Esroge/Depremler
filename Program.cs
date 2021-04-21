@@ -14,16 +14,19 @@ namespace Depremler
         {
             int total=0;
 
-            string Site = "http://udim.koeri.boun.edu.tr/zeqmap/xmlt/son24saat.xml";
+            string Site = "http://www.earthquakenewstoday.com/feed/";
             XmlDocument Veri = new XmlDocument();
             Veri.Load(Site);
 
-            XmlNodeList Liste = Veri.GetElementsByTagName("Name");
+            XmlNodeList Liste = Veri.GetElementsByTagName("title");
             total = Liste.Count;
+            
             for (int i = 0; i < Liste.Count; i++)
             {
-
+                Console.WriteLine(Liste[i].InnerText.ToString());
             }
-        }
+            Console.WriteLine(Environment.NewLine);
+            Console.ReadKey();
+        }   
     }
 }
