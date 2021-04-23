@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
 using System.Timers;
+using System.Xml.Linq;
 
 namespace Depremler
 {
@@ -13,9 +14,8 @@ namespace Depremler
     {
         static void Main(string[] args)
         {
-            
             Timer timer = new Timer();
-            timer.Interval = 2000;
+            timer.Interval = 10000;
             timer.Elapsed += project;
             timer.Start();
             Console.ReadKey();
@@ -23,8 +23,8 @@ namespace Depremler
         }   
         private static void project(Object source, System.Timers.ElapsedEventArgs e)
         {
-            string yol = @"depremler.txt";
-            string yol1 = @"degisim.txt";
+            string yol = @"depremler.txt", yol1 = @"degisim.txt";
+            
             if (File.Exists(@"depremler.txt"))
             {
                 goto A;
@@ -43,15 +43,10 @@ namespace Depremler
             Class_ degtextolustur = new Class_();
             degtextolustur.TextOlustur(yol1);
         Kopyalama:
-            StreamReader oku = new StreamReader(yol);
-            List<string> satırlar = new List<string>();
-            satırlar = File.ReadAllLines(yol).ToList();
-
-            for (int i = 0; i < satırlar.Count; i++)
-            {
-                string metin = oku.ReadLine();
-                File.WriteAllLines(yol1, satırlar);
-            }
+            List<string> satır = new List<string>();
+            satır = File.ReadAllLines(yol).ToList();
+            File.WriteAllLines(yol1, satır);
+            
 
         Karşılaştırma:
             StreamReader oku1 = new StreamReader(@"depremler.txt");
@@ -66,9 +61,7 @@ namespace Depremler
             }
             else
             {
-                Console.Clear();
                 Console.WriteLine("Veriler değişmiş.");
-                Console.ReadKey();
                 oku1.Close();
                 oku2.Close();
                 goto Kopyalama;
