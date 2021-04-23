@@ -18,14 +18,12 @@ namespace Depremler
             textolustur.TextOlustur(yol);
             Class_ okuma = new Class_();
             okuma.veriOkuma(yol);
-            Class_ yazma = new Class_();
 
             if (File.Exists(@"degisim.txt"))
             {
                 goto Karşılaştırma;
             }
 
-        
             Class_ degtextolustur = new Class_();
             degtextolustur.TextOlustur(yol1);
         Kopyalama:
@@ -44,40 +42,21 @@ namespace Depremler
             StreamReader oku2 = new StreamReader(@"degisim.txt");
             string veri1 = oku1.ReadToEnd();
             string veri2 = oku2.ReadToEnd();
+            
             if (veri1 == veri2)
             {
                 Console.WriteLine("veriler aynı.");
+                Console.ReadKey();
             }
             else
             {
+                Console.Clear();
                 Console.WriteLine("Veriler değişmiş.");
                 Console.ReadKey();
+                oku1.Close();
+                oku2.Close();
                 goto Kopyalama;
             }
-            Console.ReadKey();
-
-            //FileStream fs1 = new FileStream(yol, FileMode.Open, FileAccess.Read);
-            //StreamReader sw = new StreamReader(fs1);
-            //string yazi = sw.ReadLine();
-            //FileStream fs2 = new FileStream(yol1, FileMode.Open, FileAccess.Read);
-            //StreamReader sw2 = new StreamReader(fs2);
-            //string yazi2 = sw2.ReadLine();
-            //while (true) 
-            //{
-            //    Console.Clear();
-            //    if (yazi == yazi2)
-            //    {
-            //        Console.WriteLine("degisimyok");
-            //        break;
-            //    }
-            //    else 
-            //    {
-            //        Console.WriteLine("Yeni bir deprem olmuş.");
-            //        break;
-            //    }
-            //}
-            //Console.ReadKey();
-
         }   
     }
 }
