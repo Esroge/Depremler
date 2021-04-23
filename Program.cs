@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
+using System.Timers;
 
 namespace Depremler
 {
@@ -12,13 +13,28 @@ namespace Depremler
     {
         static void Main(string[] args)
         {
+            
+            Timer timer = new Timer();
+            timer.Interval = 2000;
+            timer.Elapsed += project;
+            timer.Start();
+            Console.ReadKey();
+
+        }   
+        private static void project(Object source, System.Timers.ElapsedEventArgs e)
+        {
             string yol = @"depremler.txt";
             string yol1 = @"degisim.txt";
+            if (File.Exists(@"depremler.txt"))
+            {
+                goto A;
+            }
+            
             Class_ textolustur = new Class_();
             textolustur.TextOlustur(yol);
             Class_ okuma = new Class_();
             okuma.veriOkuma(yol);
-
+        A:
             if (File.Exists(@"degisim.txt"))
             {
                 goto Karşılaştırma;
@@ -42,7 +58,7 @@ namespace Depremler
             StreamReader oku2 = new StreamReader(@"degisim.txt");
             string veri1 = oku1.ReadToEnd();
             string veri2 = oku2.ReadToEnd();
-            
+
             if (veri1 == veri2)
             {
                 Console.WriteLine("veriler aynı.");
@@ -57,6 +73,6 @@ namespace Depremler
                 oku2.Close();
                 goto Kopyalama;
             }
-        }   
+        }
     }
 }
