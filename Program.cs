@@ -12,60 +12,151 @@ namespace Depremler
 {
     class Program
     {
+        public static string yol1 = @"depremler.txt", yol = @"degisim.txt";
         static void Main(string[] args)
         {
-            Timer timer = new Timer();
-            timer.Interval = 10000;
-            timer.Elapsed += project;
-            timer.Start();
+
+            if (File.Exists(@"degisim.txt") == false)
+            {
+                TextOlustur(yol);
+                veriOkuma();
+                veriYazma();
+            }
+
+            if (File.Exists(@"depremler.txt") == false)
+            { 
+                TextOlustur(yol1);
+                kopyalama();
+            }
+
+            System.Threading.Timer timer = new System.Threading.Timer(project, 10, 1, 3000);
             Console.ReadKey();
-
-        }   
-        private static void project(Object source, System.Timers.ElapsedEventArgs e)
+        }
+        static void project(object args)
         {
-            string yol = @"depremler.txt", yol1 = @"degisim.txt";
-            
-            if (File.Exists(@"depremler.txt"))
+            karşılaştırma();
+        }
+        private static void TextOlustur(string y)
+        {
+            FileStream fs = File.Create(y);
+            fs.Close();
+        }
+        private static void karşılaştırma()
+        {
+            StreamReader oku1 = new StreamReader(@"degisim.txt");
+            StreamReader oku2 = new StreamReader(@"depremler.txt");
+            string veri1 = oku1.ReadToEnd();
+            string veri2 = oku2.ReadToEnd();
+            if (veri1 == veri2)
             {
-                goto A;
+                Console.WriteLine("Veriler Güncel.");
+                oku1.Close();
+                oku2.Close();
+                veriOkuma();
+                veriYazma();
             }
-            
-            Class_ textolustur = new Class_();
-            textolustur.TextOlustur(yol);
-            Class_ okuma = new Class_();
-            okuma.veriOkuma(yol);
-        A:
-            if (File.Exists(@"degisim.txt"))
+            else if (veri1 != veri2)
             {
-                goto Karşılaştırma;
+                Console.WriteLine("Yeni Bir Deprem Olmuş!");
+                Console.WriteLine("Otomatik Güncelleniyor");
+                oku1.Close();
+                oku2.Close();
+                kopyalama();
             }
-
-            Class_ degtextolustur = new Class_();
-            degtextolustur.TextOlustur(yol1);
-        Kopyalama:
+        }
+        private static void kopyalama()
+        {
+            string yol1 = @"depremler.txt", yol = @"degisim.txt";
             List<string> satır = new List<string>();
             satır = File.ReadAllLines(yol).ToList();
             File.WriteAllLines(yol1, satır);
-            
-
-        Karşılaştırma:
-            StreamReader oku1 = new StreamReader(@"depremler.txt");
-            StreamReader oku2 = new StreamReader(@"degisim.txt");
-            string veri1 = oku1.ReadToEnd();
-            string veri2 = oku2.ReadToEnd();
-
-            if (veri1 == veri2)
+            karşılaştırma();
+        }
+        private static void veriOkuma()
+        {
+            int i = 0;
+            string x;
+            String URLString = "http://udim.koeri.boun.edu.tr/zeqmap/xmlt/son24saat.xml";
+            XmlTextReader reader = new XmlTextReader(URLString);
+            List<string> satırlar = new List<string>();
+            while (reader.Read())
             {
-                Console.WriteLine("veriler aynı.");
-                Console.ReadKey();
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+
+                        satırlar.Add("<" + reader.Name + ">");
+                        File.WriteAllLines("veri.xml", satırlar);
+                        while (reader.MoveToNextAttribute())
+                            if (reader.Name == "name")
+                            {
+                                x = "Tarihi";
+                                satırlar.Add(x + " = " + reader.Value);
+                                File.WriteAllLines("veri.xml", satırlar);
+                            }
+                            else if (reader.Name == "lokasyon")
+                            {
+                                x = "Konumu";
+                                satırlar.Add(x + " = " + reader.Value);
+                                File.WriteAllLines("veri.xml", satırlar);
+                            }
+                            else if (reader.Name == "lat")
+                            {
+                                x = "Enlem";
+                                satırlar.Add(x + " = " + reader.Value);
+                                File.WriteAllLines("veri.xml", satırlar);
+                            }
+                            else if (reader.Name == "lng")
+                            {
+                                x = "Boylam";
+                                satırlar.Add(x + " = " + reader.Value);
+                                File.WriteAllLines("veri.xml", satırlar);
+                            }
+                            else if (reader.Name == "mag")
+                            {
+                                x = "Büyüklük";
+                                satırlar.Add(x + " = " + reader.Value);
+                                File.WriteAllLines("veri.xml", satırlar);
+                            }
+                            else if (reader.Name == "Depth")
+                            {
+                                x = "Derinlik";
+                                satırlar.Add(x + " = " + reader.Value);
+                                File.WriteAllLines("veri.xml", satırlar);
+                            }
+                        i++;
+                        if (i != 1)
+                        {
+                            satırlar.Add("</earhquake>");
+                        }
+                        File.WriteAllLines("veri.xml", satırlar);
+                        break;
+                    case XmlNodeType.Text:
+                        satırlar.Add(reader.Value);
+                        File.WriteAllLines("veri.xml", satırlar);
+                        break;
+                    case XmlNodeType.EndElement:
+                        satırlar.Add("</" + reader.Name + ">");
+                        File.WriteAllLines("veri.xml", satırlar);
+                        break;
+                }
             }
-            else
+            reader.Close();
+        }
+        private static void veriYazma()
+        {
+            XmlTextReader metin = new XmlTextReader(@"veri.xml");
+            List<string> satır = new List<string>();
+            while (metin.Read())
             {
-                Console.WriteLine("Veriler değişmiş.");
-                oku1.Close();
-                oku2.Close();
-                goto Kopyalama;
+                if (metin.NodeType == XmlNodeType.Element && metin.Name == "earhquake")
+                {
+                    string s1 = metin.ReadElementString();
+                    satır.Add(s1.ToString());
+                    File.WriteAllLines(yol, satır);
+                }
             }
+            metin.Close();
         }
     }
 }
