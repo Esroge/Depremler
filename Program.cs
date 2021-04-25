@@ -18,28 +18,25 @@ namespace Depremler
 
             if (File.Exists(@"degisim.txt") == false)
             {
-                TextOlustur(yol);
                 veriOkuma();
-                veriYazma();
             }
 
             if (File.Exists(@"depremler.txt") == false)
             { 
-                TextOlustur(yol1);
                 kopyalama();
             }
 
-            System.Threading.Timer timer = new System.Threading.Timer(project, 10, 1, 3000);
+            Timer timer = new Timer(10000);
+            timer.Elapsed += Timer_Elapsed; 
+            timer.Start();
             Console.ReadKey();
+            timer.Stop();
         }
-        static void project(object args)
+
+        private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            veriOkuma();
             karşılaştırma();
-        }
-        private static void TextOlustur(string y)
-        {
-            FileStream fs = File.Create(y);
-            fs.Close();
         }
         private static void karşılaştırma()
         {
@@ -52,8 +49,6 @@ namespace Depremler
                 Console.WriteLine("Veriler Güncel.");
                 oku1.Close();
                 oku2.Close();
-                veriOkuma();
-                veriYazma();
             }
             else if (veri1 != veri2)
             {
@@ -86,7 +81,7 @@ namespace Depremler
                     case XmlNodeType.Element:
 
                         satırlar.Add("<" + reader.Name + ">");
-                        File.WriteAllLines("veri.xml", satırlar);
+                         File.WriteAllLines("veri.xml", satırlar);
                         while (reader.MoveToNextAttribute())
                             if (reader.Name == "name")
                             {
@@ -142,6 +137,7 @@ namespace Depremler
                 }
             }
             reader.Close();
+            veriYazma();
         }
         private static void veriYazma()
         {
